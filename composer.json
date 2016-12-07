@@ -29,5 +29,6 @@
             "/sample",
             "/.*"
         ]
-    }
+    },
+    "bin" : [ "shell/xtable.php" ]
 }

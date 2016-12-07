@@ -19,8 +19,19 @@ abstract class AbstractBuilder {
         }
     }
 
+    /**
+     * テーブル名を設定
+     * @param string $table
+     */
     public function setTableName($table){
         $this->table_name = $table;
+    }
+    /**
+     * テーブル名を取得
+     * @return string
+     */
+    public function getTableName(){
+        return $this->table_name;
     }
 
     public function setTableAttrs($attrs){

@@ -185,11 +185,15 @@ class XMLFactory
                 return array('type' => 'string', 'pdo' => PDO::PARAM_STR);
             case 'text':
                 return array('type' => 'text', 'pdo' => PDO::PARAM_STR);
+            case 'tinyint':
             case 'smallint':
+            case 'mediumint':
             case 'int':
             case 'integer':
+            case 'enum':
+                return array('type' => 'integer', 'pdo' => PDO::PARAM_INT);
             case 'bigint':
-                return array('type' => 'integer', 'pdo' => PDO::PARAM_STR);
+                return array('type' => 'long', 'pdo' => PDO::PARAM_INT);
             case 'bool':
             case 'boolean':
                 return array('type' => 'bool', 'pdo' => PDO::PARAM_INT);

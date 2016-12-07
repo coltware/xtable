@@ -29,11 +29,10 @@ class MySQLBuilder extends AbstractBuilder{
 
         switch($type['type']){
             case 'serial':
-                $f_type = "INTEGER";
+                $f_type = "BIGINT UNSIGNED";
                 if(isset($attrs['start']) && ctype_digit($attrs['start'])){
                     $this->auto_increment = $attrs['start'];
                 }
-
                 break;
             case 'string':
                 $f_type = sprintf("%s(%s)","varchar",$attrs['size']);
@@ -44,6 +43,16 @@ class MySQLBuilder extends AbstractBuilder{
             case 'integer':
                 $f_type = "INTEGER";
                 break;
+            case 'bigint':
+            case 'long':
+                $f_type = "BIGINT";
+                break;
+            case 'tinyint':
+                $f_type = "TINYINT";
+                break;
+            case 'smallint':
+                $f_type = "SMALLINT";
+                break;
             case 'bool':
                 $f_type = "TINYINT(1)";
                 break;
@@ -52,6 +61,9 @@ class MySQLBuilder extends AbstractBuilder{
                 break;
             case 'datetime':
                 $f_type = "DATETIME";
+                break;
+            default:
+                var_dump(array($name,$field,$type));
                 break;
         }
 
@@ -131,13 +143,13 @@ class MySQLBuilder extends AbstractBuilder{
 
         foreach($this->fields as $name => $field){
             if($version >= $field['since']) {
-                $line[] = $field['sql'];
+                $line[] = "    ".$field['sql'];
                 $target[] = $name;
             }
         }
 
         if($this->pkeys){
-            $line[] = sprintf("PRIMARY KEY(%s)",join(",",$this->pkeys));
+            $line[] = sprintf("    PRIMARY KEY(%s)",join(",",$this->pkeys));
         }
 
         $ddl[] = join(",".PHP_EOL,$line);
@@ -149,17 +161,17 @@ class MySQLBuilder extends AbstractBuilder{
             $table_attrs[] = sprintf("AUTO_INCREMENT = %s",$this->auto_increment);
         }
 
-        if($this->table_attrs['mysql-engine']){
+        if(isset($this->table_attrs['mysql-engine'])){
             $table_attrs[] = sprintf("ENGINE=%s",$this->table_attrs['mysql-engine']);
         }
-        if($this->table_attrs['charset']){
+        if(isset($this->table_attrs['charset'])){
             $charset = $this->table_attrs['charset'];
             if(strtolower($charset) == 'utf-8'){
                 $charset = 'utf8';
             }
-            $table_attrs[] = sprintf("CHARACTER SET '%s'",$charset);
+            $table_attrs[] = sprintf(" CHARACTER SET '%s'",$charset);
         }
-        if($this->getOption("comment",true) == true && $this->table_attrs['comment']){
+        if($this->getOption("comment",true) == true && isset($this->table_attrs['comment'])){
             $table_attrs[] = sprintf("COMMENT = '%s'",$this->table_attrs['comment']);
         }
 
@@ -167,10 +179,10 @@ class MySQLBuilder extends AbstractBuilder{
 
 
         if(count($this->index_list)){
-            foreach($this->index_list as $idx){
+            foreach($this->index_list as $num => $idx){
                 $idx_name = $idx['name'];
                 if(!$idx_name){
-                    $cnt = count($this->index_list) + 1;
+                    $cnt = $num + 1;
                     $idx_name = sprintf("%s_idx%s",$this->table_name,$cnt);
                 }
                 $_flds = array();
