@@ -53,6 +53,12 @@ class MySQLBuilder extends AbstractBuilder{
             case 'smallint':
                 $f_type = "SMALLINT";
                 break;
+            case 'decimal':
+                $f_type = sprintf("%s(%s)","DECIMAL",$attrs['size']);
+                break;
+            case 'numeric':
+                $f_type = sprintf("%s(%s)","NUMERIC",$attrs['size']);
+                break;
             case 'bool':
                 $f_type = "TINYINT(1)";
                 break;
@@ -68,6 +74,7 @@ class MySQLBuilder extends AbstractBuilder{
         }
 
         $field_line[] = str_pad(sprintf('`%s`',$name),15," ");
+
         $field_line[] = str_pad($f_type,12," ");
 
         if(isset($attrs['unique'])){

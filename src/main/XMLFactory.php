@@ -185,6 +185,10 @@ class XMLFactory
                 return array('type' => 'string', 'pdo' => PDO::PARAM_STR);
             case 'text':
                 return array('type' => 'text', 'pdo' => PDO::PARAM_STR);
+            case 'decimal' :
+                return array('type' => 'decimal', 'pod' => PDO::PARAM_STR);
+            case 'numeric' :
+                return array('type' => 'numeric', 'pod' => PDO::PARAM_STR);
             case 'tinyint':
             case 'smallint':
             case 'mediumint':
