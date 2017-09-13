@@ -13,7 +13,8 @@ $opts = array();
 $longopts = array(
     "create",
     "alter",
-    "drop"
+    "drop",
+    "since:"
 );
 
 $options = getopt("f:",$longopts);
@@ -39,7 +40,6 @@ else{
 }
 
 
-
 $types = array();
 
 if(isset($options['drop'])){
@@ -51,6 +51,10 @@ if(isset($options['create'])){
 }
 else if(isset($options['alter'])){
     $types[] = "alter";
+}
+
+if(isset($options['since'])){
+   $since = $options['since'];
 }
 $ddl = array();
 foreach($files as $file) {
