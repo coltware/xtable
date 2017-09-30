@@ -87,7 +87,7 @@ class MySQLBuilder extends AbstractBuilder{
         $def = isset($attrs['default'])? $attrs['default']: null;
         if($def !== '' && $def !== null){
             if($type['type'] == 'string'){
-                $field[] = sprintf("DEFAULT '%s'",$def);
+                $field_line[] = sprintf("DEFAULT '%s'",$def);
             }
             else if($type['type'] == 'bool'){
                 $def = substr(strtolower($def),0,1);
