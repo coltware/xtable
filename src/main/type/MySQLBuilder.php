@@ -68,6 +68,10 @@ class MySQLBuilder extends AbstractBuilder{
             case 'datetime':
                 $f_type = "DATETIME";
                 break;
+            case 'blob':
+            case 'mediumblob':
+                $f_type = strtoupper($type['type']);
+                break;
             default:
                 var_dump(array($name,$field,$type));
                 break;

@@ -206,6 +206,10 @@ class XMLFactory
             case 'datetime':
             case 'timestamp':
                 return array('type' => 'datetime','pdo' => PDO::PARAM_STR);
+            case 'blob':
+            case 'mediumblob':
+                $type = $val;
+                return array('type' => $type,'pdo' => PDO::PARAM_STR);
             default:
                 return null;
         }
