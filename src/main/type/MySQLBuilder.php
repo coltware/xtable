@@ -72,6 +72,9 @@ class MySQLBuilder extends AbstractBuilder{
             case 'mediumblob':
                 $f_type = strtoupper($type['type']);
                 break;
+            case 'json':
+                $f_type = "JSON";
+                break;
             default:
                 var_dump(array($name,$field,$type));
                 break;
@@ -84,7 +87,7 @@ class MySQLBuilder extends AbstractBuilder{
         if(isset($attrs['unique'])){
             $unique = substr(strtolower($attrs['unique']),0,1);
             if($unique == '1' || $unique == 't'){
-              $field_line[] = "UNIQUE";
+                $field_line[] = "UNIQUE";
             }
         }
 
@@ -180,8 +183,12 @@ class MySQLBuilder extends AbstractBuilder{
             if(strtolower($charset) == 'utf-8'){
                 $charset = 'utf8';
             }
-            $table_attrs[] = sprintf(" CHARACTER SET '%s'",$charset);
+            $table_attrs[] = sprintf(" DEFAULT CHARSET=%s",$charset);
+            if(isset($this->table_attrs['collate'])){
+                $table_attrs[] = sprintf(" COLLATE=%s",$this->table_attrs['collate']);
+            }
         }
+
         if($this->getOption("comment",true) == true && isset($this->table_attrs['comment'])){
             $table_attrs[] = sprintf("COMMENT = '%s'",$this->table_attrs['comment']);
         }
@@ -198,7 +205,16 @@ class MySQLBuilder extends AbstractBuilder{
                 }
                 $_flds = array();
                 foreach($idx['fields'] as $f){
-                    $_flds[] = sprintf('`%s`',$f);
+                    $cnt = count($f['attrs']);
+                    if($cnt == 0) {
+                        $_flds[] = sprintf('`%s`', $f['name']);
+                    }
+                    else{
+                        $attrs = $f['attrs'];
+                        if(isset($attrs['size'])){
+                            $_flds[] = sprintf('`%s`(%s)',$f['name'],$attrs['size']);
+                        }
+                    }
                 }
                 $idx_fields = join(",",$_flds);
                 $ddl[] = sprintf("ALTER TABLE `%s` ADD INDEX %s(%s);",$this->table_name,$idx_name,$idx_fields);
@@ -245,4 +261,4 @@ class MySQLBuilder extends AbstractBuilder{
         }
         return join(PHP_EOL,$sql);
     }
-} 
+}
