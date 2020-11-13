@@ -69,7 +69,10 @@ class XMLFactory
 
                     foreach($index_children as $idx){
                         $fname = (string)$idx;
-                        $_idx[] = $fname;
+                        $_idx[] = array(
+                            "attrs" => $idx->attributes(),
+                            "name" => $fname
+                        );
                     }
 
                     $builder->addIndex($_attrs,$_idx);
@@ -185,6 +188,10 @@ class XMLFactory
                 return array('type' => 'string', 'pdo' => PDO::PARAM_STR);
             case 'text':
                 return array('type' => 'text', 'pdo' => PDO::PARAM_STR);
+            case 'decimal' :
+                return array('type' => 'decimal', 'pdo' => PDO::PARAM_STR);
+            case 'numeric' :
+                return array('type' => 'numeric', 'pdo' => PDO::PARAM_STR);
             case 'tinyint':
             case 'smallint':
             case 'mediumint':
@@ -202,6 +209,12 @@ class XMLFactory
             case 'datetime':
             case 'timestamp':
                 return array('type' => 'datetime','pdo' => PDO::PARAM_STR);
+            case 'blob':
+            case 'mediumblob':
+                $type = $val;
+                return array('type' => $type,'pdo' => PDO::PARAM_STR);
+            case 'json':
+                return array('type' => 'json','pdo' => PDO::PARAM_STR);
             default:
                 return null;
         }

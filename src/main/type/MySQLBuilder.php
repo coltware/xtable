@@ -56,6 +56,12 @@ class MySQLBuilder extends AbstractBuilder{
             case 'smallint':
                 $f_type = "SMALLINT";
                 break;
+            case 'decimal':
+                $f_type = sprintf("%s(%s)","DECIMAL",$attrs['size']);
+                break;
+            case 'numeric':
+                $f_type = sprintf("%s(%s)","NUMERIC",$attrs['size']);
+                break;
             case 'bool':
                 $f_type = "TINYINT(1)";
                 break;
@@ -65,25 +71,33 @@ class MySQLBuilder extends AbstractBuilder{
             case 'datetime':
                 $f_type = "DATETIME";
                 break;
+            case 'blob':
+            case 'mediumblob':
+                $f_type = strtoupper($type['type']);
+                break;
+            case 'json':
+                $f_type = "JSON";
+                break;
             default:
                 var_dump(array($name,$field,$type));
                 break;
         }
 
         $field_line[] = str_pad(sprintf('`%s`',$name),15," ");
+
         $field_line[] = str_pad($f_type,12," ");
 
         if(isset($attrs['unique'])){
             $unique = substr(strtolower($attrs['unique']),0,1);
             if($unique == '1' || $unique == 't'){
-              $field_line[] = "UNIQUE";
+                $field_line[] = "UNIQUE";
             }
         }
 
         $def = isset($attrs['default'])? $attrs['default']: null;
         if($def !== '' && $def !== null){
             if($type['type'] == 'string'){
-                $field[] = sprintf("DEFAULT '%s'",$def);
+                $field_line[] = sprintf("DEFAULT '%s'",$def);
             }
             else if($type['type'] == 'bool'){
                 $def = substr(strtolower($def),0,1);
@@ -172,8 +186,12 @@ class MySQLBuilder extends AbstractBuilder{
             if(strtolower($charset) == 'utf-8'){
                 $charset = 'utf8';
             }
-            $table_attrs[] = sprintf(" CHARACTER SET '%s'",$charset);
+            $table_attrs[] = sprintf(" DEFAULT CHARSET=%s",$charset);
+            if(isset($this->table_attrs['collate'])){
+                $table_attrs[] = sprintf(" COLLATE=%s",$this->table_attrs['collate']);
+            }
         }
+
         if($this->getOption("comment",true) == true && isset($this->table_attrs['comment'])){
             $table_attrs[] = sprintf("COMMENT = '%s'",$this->table_attrs['comment']);
         }
@@ -190,7 +208,16 @@ class MySQLBuilder extends AbstractBuilder{
                 }
                 $_flds = array();
                 foreach($idx['fields'] as $f){
-                    $_flds[] = sprintf('`%s`',$f);
+                    $cnt = count($f['attrs']);
+                    if($cnt == 0) {
+                        $_flds[] = sprintf('`%s`', $f['name']);
+                    }
+                    else{
+                        $attrs = $f['attrs'];
+                        if(isset($attrs['size'])){
+                            $_flds[] = sprintf('`%s`(%s)',$f['name'],$attrs['size']);
+                        }
+                    }
                 }
                 $idx_fields = join(",",$_flds);
                 $ddl[] = sprintf("ALTER TABLE `%s` ADD INDEX %s(%s);",$this->table_name,$idx_name,$idx_fields);
@@ -237,4 +264,4 @@ class MySQLBuilder extends AbstractBuilder{
         }
         return join(PHP_EOL,$sql);
     }
-} 
+}
