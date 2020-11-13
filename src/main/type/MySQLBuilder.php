@@ -94,6 +94,10 @@ class MySQLBuilder extends AbstractBuilder{
             }
         }
 
+        if(isset($attrs['charset'])){
+            $field_line[] = sprintf("CHARACTER SET %s",$attrs['charset']);
+        }
+
         $def = isset($attrs['default'])? $attrs['default']: null;
         if($def !== '' && $def !== null){
             if($type['type'] == 'string'){
