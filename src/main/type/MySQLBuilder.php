@@ -35,6 +35,9 @@ class MySQLBuilder extends AbstractBuilder{
                 }
                 break;
             case 'string':
+                if(!isset($attrs['size'])){
+                    $attrs['size'] = "255";
+                }
                 $f_type = sprintf("%s(%s)","varchar",$attrs['size']);
                 break;
             case 'text':
