@@ -15,10 +15,12 @@ class MySQLBuilder extends AbstractBuilder{
     public function addIndex($attr,$fields){
 
         $name = isset($attr['name'])? $attr['name'] :null;
+        $type = isset($attr['type'])? $attr['type'] :null;
 
         $this->index_list[] = array(
             "name"      => $name,
             "fields"    => $fields,
+            "type"      => $type
         );
     }
 
@@ -224,7 +226,12 @@ class MySQLBuilder extends AbstractBuilder{
                     }
                 }
                 $idx_fields = join(",",$_flds);
-                $ddl[] = sprintf("ALTER TABLE `%s` ADD INDEX %s(%s);",$this->table_name,$idx_name,$idx_fields);
+                $type = "";
+                if($idx['type']){
+                    $type = sprintf("%s ",strtoupper($idx['type']));
+                }
+
+                $ddl[] = sprintf("ALTER TABLE `%s` ADD %sINDEX %s(%s);",$this->table_name,$type,$idx_name,$idx_fields);
             }
         }
 
